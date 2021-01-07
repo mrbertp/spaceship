@@ -1,0 +1,13 @@
+FPS = 30
+WIDTH = 600
+HEIGHT = 600
+SCALE = 1
+SIZE = 8
+COLOR = (255, 255, 255)
+BLUE = (0, 0, 255)
+YELLOW = (200, 200, 0)
+GREY = (100, 100, 100)
+G = 1
+trail = False
+distance = False
+forces = True
