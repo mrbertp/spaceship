@@ -25,7 +25,7 @@ class Position(Coordinates):
 
 class Body(pg.sprite.Sprite, Position):
 
-    def __init__(self, x=0, y=0, ID='', mass=1, size=5, color=ct.COLOR):
+    def __init__(self, x=0, y=0, ID='', mass=1, size=5, color=ct.WHITE):
         pg.sprite.Sprite.__init__(self)
         Position.__init__(self, x=x, y=y)
 
@@ -43,8 +43,8 @@ class Body(pg.sprite.Sprite, Position):
         self.prop = np.array([0, 0])
 
         if self.ID == 'ship':
-            self.prop_mag = 1
-            self.prop_u = phy.normalize(np.array([1, 1]))
+            self.prop_mag = 5
+            self.prop_u = phy.normalize(np.array([1, -1]))
             self.prop = self.prop_mag * self.prop_u
 
     def motion(self):
@@ -52,7 +52,7 @@ class Body(pg.sprite.Sprite, Position):
         self.f_total = self.g_force + self.prop
         self.acc = self.f_total / self.mass
         self.vel = self.vel + self.acc
-        self.pos = self.pos + self.vel
+        self.pos = self.pos + self.acc
         self.rect.centerx = phy.trans(self.pos)[0]
         self.rect.centery = phy.trans(self.pos)[1]
 
