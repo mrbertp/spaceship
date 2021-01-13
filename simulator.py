@@ -5,6 +5,7 @@ import constants as ct
 import navigation as nav
 import physics as phy
 import control as ctr
+import datetime as dt
 
 # INITIALIZATION
 pg.init()
@@ -18,20 +19,22 @@ toogle_distance = ct.distance
 toogle_forces = ct.forces
 t = 0
 
-ship = nav.Body(ID='ship', x=700, y=700, size=5, mass=10)
-star = nav.Body(ID='star', x=0, y=0, size=5, mass=100000)
-#planetA = nav.Body(ID='A', x=-2000, y=-2000, size=10, mass=6 * 10**3)
-#planetB = nav.Body(ID='B', x=2000, y=2000, size=10, mass=6 * 10**3)
+bodies = pg.sprite.Group()
+ships = pg.sprite.Group()
+trails = pg.sprite.Group()
+
+with open('quadrant-1.txt', 'r') as quadrant:
+    for line in quadrant:
+        entry = line.strip().split('\t')
+        ID = entry[0]
+        x, y, mass, size = list(map(int, entry[1:]))
+        body = nav.Body(x=x, y=y, ID=ID, mass=mass, size=size)
+        bodies.add(body)
+
+ship = nav.Body(ID='ship', x=700, y=700, mass=10, size=5)
+ships.add(ship)
 
 flight = ctr.Flight(ship)
-
-bodies = pg.sprite.Group()
-trails = pg.sprite.Group()
-bodies.add(ship)
-bodies.add(star)
-# bodies.add(planetA)
-# bodies.add(planetB)
-
 
 # GAME LOOP
 running = True
@@ -61,9 +64,13 @@ while running:
         t = 1
     else:
         t += 1
-    ship.g_force = ship.g_force + phy.g_force(star, ship)
+
+    for body in bodies:
+        ship.g_force = ship.g_force + phy.g_force(body, ship)
+
     flight.update()
     bodies.update()
+    ships.update()
 
     if toogle_trail:
         if t % 50 == 0:
@@ -85,15 +92,13 @@ while running:
         trails.empty()
 
     bodies.draw(screen)
-    #pg.draw.circle(screen, ct.YELLOW, (int(phy.trans(star.pos)[0]), int(phy.trans(star.pos)[1])), 14)
+    ships.draw(screen)
     # text
     text, rect = myfont.render(f'F total: {round(phy.distance((0,0),ship.f_total), 4)} N', (255, 255, 255))
     screen.blit(text, (5, 5))
-    text, rect = myfont.render(f'Grav: {round(phy.distance((0,0),phy.g_force(star, ship)), 4)} N', (255, 255, 255))
-    screen.blit(text, (5, 25))
     text, rect = myfont.render(f'Prop: {round(ship.prop_mag, 4)} N', (255, 255, 255))
-    screen.blit(text, (5, 45))
+    screen.blit(text, (5, 25))
     text, rect = myfont.render(f'Distance: {round(flight.distance, 0)} u', (255, 255, 255))
-    screen.blit(text, (5, 65))
+    screen.blit(text, (5, 45))
 
     pg.display.flip()
