@@ -17,7 +17,7 @@ class Coordinates():
 
 class Position(Coordinates):
 
-    def __init__(self, x=0, y=0, orx=0, ory=10):
+    def __init__(self, x=0, y=0, orx=0, ory=1):
         Coordinates.__init__(self, kind='cart-pygame')
         self.pos = np.array([x, y])
         self.orientation = np.array([orx, ory])
@@ -25,7 +25,7 @@ class Position(Coordinates):
 
 class Body(pg.sprite.Sprite, Position):
 
-    def __init__(self, x=0, y=0, ID='', mass=1, size=5, color=ct.WHITE):
+    def __init__(self, ID='', x=0, y=0, mass=1, size=5, color=ct.WHITE, vel=np.array([0, 0])):
         pg.sprite.Sprite.__init__(self)
         Position.__init__(self, x=x, y=y)
 
@@ -39,11 +39,11 @@ class Body(pg.sprite.Sprite, Position):
 
         self.mass = mass
         self.g_force = np.array([0, 0])
-        self.vel = np.array([0, 0])
+        self.vel = vel
         self.prop = np.array([0, 0])
 
         if self.ID == 'ship':
-            self.prop_mag = 5
+            self.prop_mag = 0
             self.prop_u = phy.normalize(np.array([1, -1]))
             self.prop = self.prop_mag * self.prop_u
 
@@ -52,7 +52,7 @@ class Body(pg.sprite.Sprite, Position):
         self.f_total = self.g_force + self.prop
         self.acc = self.f_total / self.mass
         self.vel = self.vel + self.acc
-        self.pos = self.pos + self.acc
+        self.pos = self.pos + self.vel
         self.rect.centerx = phy.trans(self.pos)[0]
         self.rect.centery = phy.trans(self.pos)[1]
 

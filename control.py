@@ -14,7 +14,7 @@ class Flight():
     def update(self):
 
         self.distance = phy.distance(self.target, self.subject.pos)
-        self.ert = self.distance / self.subject.prop_mag
+        self.ert = self.distance / phy.distance((0, 0), self.subject.vel)
 
 
 class Panel():

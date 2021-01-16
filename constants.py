@@ -1,13 +1,13 @@
-FPS = 120
+FPS = 100
 WIDTH = 600
 HEIGHT = 600
-SCALE = 4
+SCALE = 10
 SIZE = 8
 WHITE = (255, 255, 255)
 BLUE = (0, 50, 255)
 YELLOW = (200, 200, 0)
-GREY = (250, 0, 0)
-G = 6.674 * 10**(-3)
+GREY = (100, 100, 100)
+G = 6.674 * 10**(-11)
 trail = False
 distance = False
 forces = False
