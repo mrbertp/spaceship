@@ -5,7 +5,6 @@ import constants as ct
 import navigation as nav
 import physics as phy
 import control as ctr
-import datetime as dt
 
 # INITIALIZATION
 pg.init()
@@ -23,16 +22,19 @@ bodies = pg.sprite.Group()
 ships = pg.sprite.Group()
 trails = pg.sprite.Group()
 
+# FILE READ
 with open('quadrant-1.txt', 'r') as quadrant:
     for line in quadrant:
         entry = line.strip().split('\t')
         ID = entry[0]
-        x, y, mass, size = list(map(int, entry[1:]))
-        body = nav.Body(x=x, y=y, ID=ID, mass=mass, size=size)
-        bodies.add(body)
+        x, y, mass, size, vx, vy = list(map(float, entry[1:]))
+        if ID == 'SHIP':
+            ship = nav.Body(ID=ID, x=x, y=y, mass=mass, size=size, vel=np.array([vx, vy]))
+            ships.add(ship)
+        else:
+            body = nav.Body(ID=ID, x=x, y=y, mass=mass, size=size, vel=np.array([vx, vy]))
+            bodies.add(body)
 
-ship = nav.Body(ID='ship', x=1000, y=0, mass=10, size=5, vel=np.array([0, -3]))
-ships.add(ship)
 
 flight = ctr.Flight(ship)
 
@@ -41,7 +43,7 @@ running = True
 while running:
     # 0. run the loop at the desired frame rate
     clock.tick(ct.FPS)
-    # 1. process input
+    # 1. USER INPUT
     for event in pg.event.get():
         if event.type == pg.QUIT:
             running = False
@@ -55,20 +57,23 @@ while running:
             if event.key == pg.K_f:
                 toogle_forces = not(toogle_forces)
 
-    # 2. update
+    # 2. UPDATE
     # gravity calculation
+    ship.g_force = np.array([0, 0])
     for b in bodies:
-        ship.g_force = phy.g_force(b, ship)
+        ship.g_force = ship.g_force + phy.g_force(b, ship)
+        b.g_force = np.array([0, 0])
         for v in bodies:
             if v.ID != b.ID:
-                b.g_force = phy.g_force(v, b)
+                b.g_force = b.g_force + phy.g_force(v, b)
+
     # trail calculation
     if t > 100:
         t = 1
     else:
         t += 1
     if toogle_trail:
-        if t % 20 == 0:
+        if t % 50 == 0:
             trail = nav.Body(x=ship.pos[0], y=ship.pos[1], size=1, color=ct.YELLOW)
             trails.add(trail)
             trails.update()
@@ -77,7 +82,7 @@ while running:
     ships.update()
     flight.update()
 
-    # 3. render
+    # 3. RENDER
     screen.fill((0, 0, 0))
 
     # draw
@@ -92,6 +97,7 @@ while running:
 
     bodies.draw(screen)
     ships.draw(screen)
+
     # text
     text, rect = myfont.render(f'Vel: {round(phy.distance((0,0),ship.vel), 4)} u/s', (255, 255, 255))
     screen.blit(text, (5, 5))

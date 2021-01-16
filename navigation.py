@@ -42,7 +42,7 @@ class Body(pg.sprite.Sprite, Position):
         self.vel = vel
         self.prop = np.array([0, 0])
 
-        if self.ID == 'ship':
+        if self.ID == 'SHIP':
             self.prop_mag = 0
             self.prop_u = phy.normalize(np.array([1, -1]))
             self.prop = self.prop_mag * self.prop_u
