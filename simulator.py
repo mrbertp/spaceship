@@ -63,6 +63,7 @@ while running:
     for b in bodies:
         ship.g_force = ship.g_force + phy.g_force(b, ship)
         b.g_force = np.array([0, 0])
+        b.g_force = b.g_force + phy.g_force(ship, b)
         for v in bodies:
             if v.ID != b.ID:
                 b.g_force = b.g_force + phy.g_force(v, b)
