@@ -35,8 +35,9 @@ with open('quadrant-1.txt', 'r') as quadrant:
             body = nav.Body(ID=ID, x=x, y=y, mass=mass, size=size, vel=np.array([vx, vy]))
             bodies.add(body)
 
-
-flight = ctr.Flight(ship)
+for b in bodies:
+    if b.ID == 'STAR':
+        flight = ctr.Flight(ship, b)
 
 # GAME LOOP
 running = True
@@ -79,22 +80,23 @@ while running:
             trails.add(trail)
             trails.update()
     # update elements
+    flight.update()
     bodies.update()
     ships.update()
-    flight.update()
 
     # 3. RENDER
     screen.fill((0, 0, 0))
 
     # draw
     if toogle_distance:
-        pg.draw.line(screen, ct.BLUE, phy.trans(ship.pos), phy.trans(flight.target))
+        pg.draw.line(screen, ct.BLUE, phy.trans(ship.pos), phy.trans(flight.target.pos))
     if toogle_forces:
         pg.draw.line(screen, ct.YELLOW, phy.trans(ship.pos), phy.trans(ship.pos) + phy.trans(ship.f_total, center=False) * 20 * ct.SCALE)
     if toogle_trail:
         trails.draw(screen)
     else:
         trails.empty()
+    pg.draw.line(screen, ct.WHITE, phy.trans(ship.pos), phy.trans(ship.pos) + phy.trans(ship.prop, center=False) * 1 * ct.SCALE)
 
     bodies.draw(screen)
     ships.draw(screen)
@@ -102,9 +104,28 @@ while running:
     # text
     text, rect = myfont.render(f'Vel: {round(phy.distance((0,0),ship.vel), 4)} u/s', (255, 255, 255))
     screen.blit(text, (5, 5))
-    text, rect = myfont.render(f'Gravity: {round(phy.distance((0,0),ship.g_force), 4)} N', (255, 255, 255))
+    text, rect = myfont.render(f'Vc: {round(flight.vc, 4)} m/s', (255, 255, 255))
     screen.blit(text, (5, 25))
-    text, rect = myfont.render(f'Distance: {round(flight.distance, 0)} u', (255, 255, 255))
+    text, rect = myfont.render(f'Ve: {round(flight.ve, 4)} m/s', (255, 255, 255))
     screen.blit(text, (5, 45))
+    text, rect = myfont.render(f'F total: {round(phy.distance((0,0),ship.f_total), 4)} N', (255, 255, 255))
+    screen.blit(text, (5, 85))
+    text, rect = myfont.render(f'Gravity: {round(phy.distance((0,0),ship.g_force), 4)} N', (255, 255, 255))
+    screen.blit(text, (5, 105))
+    text, rect = myfont.render(f'Distance: {round(flight.distance, 0)} u', (255, 255, 255))
+    screen.blit(text, (5, 125))
+    text, rect = myfont.render(f'ERT: {round(flight.ert, 0)} s', (255, 255, 255))
+    screen.blit(text, (5, 145))
+
+    if phy.mag(ship.vel) < flight.ve:
+        if phy.mag(ship.vel) < flight.vc:
+            destiny = 'lentito'
+        else:
+            destiny = 'rapidito'
+    else:
+        destiny = 'escapito'
+
+    text, rect = myfont.render('STATUS: ' + destiny, (255, 255, 255))
+    screen.blit(text, (5, 165))
 
     pg.display.flip()

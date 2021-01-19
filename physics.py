@@ -11,6 +11,10 @@ def distance(u, v):
     return ((u[0] - v[0])**2 + (u[1] - v[1])**2)**(1 / 2)
 
 
+def mag(v):
+    return distance((0, 0), v)
+
+
 def normalize(v):
     mod = distance((0, 0), (v[0], v[1]))
     return (v / mod)
@@ -39,3 +43,11 @@ def g_force(body1, body2):
     f_u = normalize(body1.pos - body2.pos)
     f = f_mod * f_u
     return f
+
+
+def vc(atractor, atracted):
+    return (ct.G*atractor.mass/distance(atractor.pos, atracted.pos))**(1/2)
+
+
+def ve(atractor, atracted):
+    return vc(atractor, atracted)*2**(1/2)
