@@ -120,15 +120,6 @@ while running:
     screen.blit(text, (5, 125))
     text, rect = myfont.render(f'ERT: {round(flight.ert, 0)} s', (255, 255, 255))
     screen.blit(text, (5, 145))
-
-    if phy.mag(ship.vel) < flight.ve:
-        if phy.mag(ship.vel) < flight.vc:
-            destiny = 'lentito'
-        else:
-            destiny = 'rapidito'
-    else:
-        destiny = 'escapito'
-
     text, rect = myfont.render('STATUS: ' + destiny, (255, 255, 255))
     screen.blit(text, (5, 165))
 
