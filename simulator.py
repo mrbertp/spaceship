@@ -16,7 +16,7 @@ myfont = pg.freetype.SysFont('Consolas', 20)
 toogle_trail = ct.trail
 toogle_distance = ct.distance
 toogle_forces = ct.forces
-t = 0
+marker = 0
 
 bodies = pg.sprite.Group()
 ships = pg.sprite.Group()
@@ -38,6 +38,7 @@ with open('quadrant-1.txt', 'r') as quadrant:
 for b in bodies:
     if b.ID == 'STAR':
         flight = ctr.Flight(ship, b)
+
 
 # GAME LOOP
 running = True
@@ -70,12 +71,12 @@ while running:
                 b.g_force = b.g_force + phy.g_force(v, b)
 
     # trail calculation
-    if t > 100:
-        t = 1
+    if marker > 100:
+        marker = 1
     else:
-        t += 1
+        marker += 1
     if toogle_trail:
-        if t % 50 == 0:
+        if marker % 50 == 0:
             trail = nav.Body(x=ship.pos[0], y=ship.pos[1], size=1, color=ct.YELLOW)
             trails.add(trail)
             trails.update()
@@ -97,6 +98,9 @@ while running:
     else:
         trails.empty()
     pg.draw.line(screen, ct.WHITE, phy.trans(ship.pos), phy.trans(ship.pos) + phy.trans(ship.prop, center=False) * 1 * ct.SCALE)
+
+    for p in flight.trayectory_pred:
+        pg.draw.circle(screen, (0, 255, 0), (int(p[0]), int(p[1])), 2)
 
     bodies.draw(screen)
     ships.draw(screen)
