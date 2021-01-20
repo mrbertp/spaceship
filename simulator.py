@@ -5,6 +5,7 @@ import constants as ct
 import navigation as nav
 import physics as phy
 import control as ctr
+import datetime as dt
 
 # INITIALIZATION
 pg.init()
@@ -16,6 +17,7 @@ myfont = pg.freetype.SysFont('Consolas', 20)
 toogle_trail = ct.trail
 toogle_distance = ct.distance
 toogle_forces = ct.forces
+toogle_trajectory = ct.trajectory
 marker = 0
 
 bodies = pg.sprite.Group()
@@ -58,6 +60,8 @@ while running:
                 ship.prop = 0
             if event.key == pg.K_f:
                 toogle_forces = not(toogle_forces)
+            if event.key == pg.K_y:
+                toogle_trajectory = not(toogle_trajectory)
 
     # 2. UPDATE
     # gravity calculation
@@ -69,6 +73,27 @@ while running:
         for v in bodies:
             if v.ID != b.ID:
                 b.g_force = b.g_force + phy.g_force(v, b)
+
+    pred_time = 3001
+    trayectory_pred = []
+    fg_pred = np.array([0, 0])
+    ft_pred = np.array([0, 0])
+    a_pred = np.array([0, 0])
+    v_pred = flight.subject.vel
+    x_pred = flight.subject.pos
+
+    for i in range(pred_time):
+        if i == 0:
+            fg_pred = phy.g_force(flight.target, flight.subject)
+        else:
+            fg_pred = ct.G * flight.target.mass * flight.subject.mass / (phy.distance(flight.target.pos, x_pred))**2 * phy.normalize(flight.target.pos - x_pred)
+        ft_pred = fg_pred
+        a_pred = ft_pred / flight.subject.mass
+        v_pred = v_pred + a_pred
+        x_pred = x_pred + v_pred
+        if i % 100 == 0:
+            trayectory_pred.append(phy.trans(x_pred))
+            print(i, phy.trans(x_pred), phy.trans(ship.pos))
 
     # trail calculation
     if marker > 100:
@@ -98,9 +123,12 @@ while running:
     else:
         trails.empty()
     pg.draw.line(screen, ct.WHITE, phy.trans(ship.pos), phy.trans(ship.pos) + phy.trans(ship.prop, center=False) * 1 * ct.SCALE)
+    if toogle_trajectory:
+        for p in flight.trayectory_pred:
+            pg.draw.circle(screen, (0, 255, 0), (int(p[0]), int(p[1])), 2)
 
-    for p in flight.trayectory_pred:
-        pg.draw.circle(screen, (0, 255, 0), (int(p[0]), int(p[1])), 2)
+    for p in trayectory_pred:
+        pg.draw.circle(screen, (255, 0, 0), (int(p[0]), int(p[1])), 2)
 
     bodies.draw(screen)
     ships.draw(screen)
@@ -120,16 +148,11 @@ while running:
     screen.blit(text, (5, 125))
     text, rect = myfont.render(f'ERT: {round(flight.ert, 0)} s', (255, 255, 255))
     screen.blit(text, (5, 145))
-
-    if phy.mag(ship.vel) < flight.ve:
-        if phy.mag(ship.vel) < flight.vc:
-            destiny = 'lentito'
-        else:
-            destiny = 'rapidito'
-    else:
-        destiny = 'escapito'
-
-    text, rect = myfont.render('STATUS: ' + destiny, (255, 255, 255))
+    text, rect = myfont.render('STATUS: ' + flight.status, (255, 255, 255))
     screen.blit(text, (5, 165))
+
+    if flight.thrust:
+        text, rect = myfont.render('Thrust', (0, 255, 255))
+        screen.blit(text, (5, 185))
 
     pg.display.flip()
