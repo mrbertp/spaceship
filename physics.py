@@ -22,7 +22,6 @@ def normalize(v):
 
 def rotate(v, alpha):
     a = np.radians(alpha)
-    # TODO: convert float to fraction
     kernel = np.array([
         np.array([np.cos(a), np.sin(a)]),
         np.array([np.sin(a), np.cos(a)])
