@@ -5,6 +5,7 @@ import constants as ct
 import navigation as nav
 import physics as phy
 import control as ctr
+import datetime as dt
 
 # INITIALIZATION
 pg.init()
@@ -16,6 +17,7 @@ myfont = pg.freetype.SysFont('Consolas', 20)
 toogle_trail = ct.trail
 toogle_distance = ct.distance
 toogle_forces = ct.forces
+toogle_trajectory = ct.trajectory
 marker = 0
 
 bodies = pg.sprite.Group()
@@ -58,6 +60,8 @@ while running:
                 ship.prop = 0
             if event.key == pg.K_f:
                 toogle_forces = not(toogle_forces)
+            if event.key == pg.K_y:
+                toogle_trajectory = not(toogle_trajectory)
 
     # 2. UPDATE
     # gravity calculation
@@ -98,9 +102,9 @@ while running:
     else:
         trails.empty()
     pg.draw.line(screen, ct.WHITE, phy.trans(ship.pos), phy.trans(ship.pos) + phy.trans(ship.prop, center=False) * 1 * ct.SCALE)
-
-    for p in flight.trayectory_pred:
-        pg.draw.circle(screen, (0, 255, 0), (int(p[0]), int(p[1])), 2)
+    if toogle_trajectory:
+        for p in flight.trayectory_pred:
+            pg.draw.circle(screen, (0, 255, 0), (int(p[0]), int(p[1])), 2)
 
     bodies.draw(screen)
     ships.draw(screen)
@@ -120,7 +124,10 @@ while running:
     screen.blit(text, (5, 125))
     text, rect = myfont.render(f'ERT: {round(flight.ert, 0)} s', (255, 255, 255))
     screen.blit(text, (5, 145))
-    text, rect = myfont.render('STATUS: ' + destiny, (255, 255, 255))
+    text, rect = myfont.render('STATUS: ' + flight.status, (255, 255, 255))
     screen.blit(text, (5, 165))
+    if flight.thrust:
+        text, rect = myfont.render('Thrust', (0, 255, 255))
+        screen.blit(text, (5, 185))
 
     pg.display.flip()
