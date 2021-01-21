@@ -25,7 +25,7 @@ ships = pg.sprite.Group()
 trails = pg.sprite.Group()
 
 # FILE READ
-with open('quadrant-1.txt', 'r') as quadrant:
+with open('map/quadrant-1.txt', 'r') as quadrant:
     for line in quadrant:
         entry = line.strip().split('\t')
         ID = entry[0]
