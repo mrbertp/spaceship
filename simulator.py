@@ -51,6 +51,7 @@ while running:
     for event in pg.event.get():
         if event.type == pg.QUIT:
             running = False
+            end = dt.datetime.now()
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_t:
                 toogle_trail = not(toogle_trail)
@@ -102,9 +103,11 @@ while running:
     else:
         trails.empty()
     pg.draw.line(screen, ct.WHITE, phy.trans(ship.pos), phy.trans(ship.pos) + phy.trans(ship.prop, center=False) * 1 * ct.SCALE)
+
     if toogle_trajectory:
-        for p in flight.trayectory_pred:
-            pg.draw.circle(screen, (0, 255, 0), (int(p[0]), int(p[1])), 2)
+        for i in range(len(flight.trayectory)):
+            if i % 100 == 0:
+                pg.draw.circle(screen, (0, 255, 0), (int(phy.trans(flight.trayectory[i])[0]), int(phy.trans(flight.trayectory[i])[1])), 2)
 
     bodies.draw(screen)
     ships.draw(screen)
@@ -126,7 +129,7 @@ while running:
     screen.blit(text, (5, 145))
     text, rect = myfont.render('STATUS: ' + flight.status, (255, 255, 255))
     screen.blit(text, (5, 165))
-    if flight.thrust:
+    if flight.thrust_on:
         text, rect = myfont.render('Thrust', (0, 255, 255))
         screen.blit(text, (5, 185))
 

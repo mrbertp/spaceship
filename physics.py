@@ -44,9 +44,9 @@ def g_force(body1, body2):
     return f
 
 
-def vc(atractor, atracted):
-    return (ct.G*atractor.mass/distance(atractor.pos, atracted.pos))**(1/2)
+def vc(M, r):
+    return (ct.G*M/r)**(1/2)
 
 
-def ve(atractor, atracted):
-    return vc(atractor, atracted)*2**(1/2)
+def ve(M, r):
+    return vc(M, r)*2**(1/2)
