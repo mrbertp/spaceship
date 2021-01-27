@@ -108,12 +108,15 @@ while running:
         for i in range(len(flight.trayectory)):
             if i % 100 == 0:
                 pg.draw.circle(screen, (0, 255, 0), (int(phy.trans(flight.trayectory[i])[0]), int(phy.trans(flight.trayectory[i])[1])), 2)
+        for i in range(len(flight.orbit)):
+            if i % 100 == 0:
+                pg.draw.circle(screen, (200, 0, 0), (int(phy.trans(flight.orbit[i])[0]), int(phy.trans(flight.orbit[i])[1])), 2)
 
     bodies.draw(screen)
     ships.draw(screen)
 
     # text
-    text, rect = myfont.render(f'Vel: {round(phy.distance((0,0),ship.vel), 4)} u/s', (255, 255, 255))
+    text, rect = myfont.render(f'Vel: {round(phy.distance((0,0),ship.vel), 4)} m/s', (255, 255, 255))
     screen.blit(text, (5, 5))
     text, rect = myfont.render(f'Vc: {round(flight.vc, 4)} m/s', (255, 255, 255))
     screen.blit(text, (5, 25))

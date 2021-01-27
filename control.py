@@ -14,6 +14,7 @@ class Flight():
         self.thrust_on = False
         self.thrust_mag = 0
         self.status = ''
+        self.thrust_duration = 10
 
         # trajectory and velocity prediction
         self.fg_pred = np.array([0, 0])
@@ -38,17 +39,37 @@ class Flight():
             self.trayectory.append(self.x_pred)
             self.velocities.append(self.v_pred)
 
-        self.distances = [phy.distance(i, self.target.pos) for i in self.trayectory]
-        self.velocities_mag = [phy.mag(i) for i in self.velocities]
+        self.distances = np.array([phy.distance(i, self.target.pos) for i in self.trayectory])
+        self.velocities = np.array(self.velocities)
+        self.speeds = np.array([phy.mag(i) for i in self.velocities])
 
         # orbit establishment
-        self.thrust_point = min(self.distances)
-        self.v_max = max(self.velocities_mag)
-        self.v_orb = phy.vc(self.target.mass, self.thrust_point)
-        self.thrust_time = 10
-        self.dv = self.v_max - self.v_orb
-        self.thrust_acc = self.dv / self.thrust_time
+        self.min_distance = self.distances.min()
+        self.thrust_time = np.where(self.distances == self.min_distance)[0][0]
+        self.thrust_pos = self.trayectory[self.thrust_time]
+        self.thrust_speed = self.speeds.max()
+        self.speed_orbit = phy.vc(self.target.mass, self.min_distance)
+        self.dv = self.thrust_speed - self.speed_orbit
+        self.thrust_acc = self.dv / self.thrust_duration
         self.thrust_mag = self.thrust_acc * self.subject.mass
+        self.orb_velocity = self.speed_orbit * phy.normalize(self.velocities[self.thrust_time])
+
+        # orbit representation
+        self.period = int(phy.period(self.min_distance, self.target.mass))
+        self.orbit = []
+        self.v_orbit = self.orb_velocity
+        self.x_orbit = self.thrust_pos
+
+        for i in range(self.period):
+            if i == 0:
+                self.fg_orbit = ct.G * self.target.mass * self.subject.mass / (phy.distance(self.target.pos, self.thrust_pos))**2 * phy.normalize(self.target.pos - self.thrust_pos)
+            else:
+                self.fg_orbit = ct.G * self.target.mass * self.subject.mass / (phy.distance(self.target.pos, self.x_orbit))**2 * phy.normalize(self.target.pos - self.x_orbit)
+            self.ft_orbit = self.fg_orbit
+            self.a_orbit = self.ft_orbit / self.subject.mass
+            self.v_orbit = self.v_orbit + self.a_orbit
+            self.x_orbit = self.x_orbit + self.v_orbit
+            self.orbit.append(self.x_orbit)
 
     def update(self):
 
@@ -59,18 +80,18 @@ class Flight():
         self.ve = phy.ve(self.target.mass, self.distance)
 
         # thrust
-        if (int(self.distance) == int(self.thrust_point)):
+        if (round(self.distance, 4) == round(self.min_distance, 4)):
             self.thrust_on = True
 
-        if self.thrust_on and (self.thrust_time > 0):
+        if self.thrust_on and (self.thrust_duration > 0):
 
             self.subject.prop = -phy.normalize(self.subject.vel) * self.thrust_mag
-            self.thrust_time -= 1
+            self.thrust_duration -= 1
         else:
             self.subject.prop = np.array([0, 0])
             self.thrust_on = False
 
-        # flight status
+        # orbit status
         if phy.mag(self.subject.vel) < self.ve:
             if phy.mag(self.subject.vel) < self.vc:
                 self.status = 'lentito'

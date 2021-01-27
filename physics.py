@@ -50,3 +50,7 @@ def vc(M, r):
 
 def ve(M, r):
     return vc(M, r)*2**(1/2)
+
+
+def period(r, M):
+    return 2 * np.pi * (r**3/(ct.G*M))**(1/2)
