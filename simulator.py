@@ -8,6 +8,7 @@ import control as ctr
 import datetime as dt
 
 # INITIALIZATION
+
 pg.init()
 screen = pg.display.set_mode((ct.WIDTH, ct.HEIGHT))
 pg.display.set_caption('Simulator')
@@ -24,7 +25,7 @@ bodies = pg.sprite.Group()
 ships = pg.sprite.Group()
 trails = pg.sprite.Group()
 
-# FILE READ
+# MAP READ
 with open('map/quadrant-1.txt', 'r') as quadrant:
     for line in quadrant:
         entry = line.strip().split('\t')
@@ -49,16 +50,17 @@ while running:
     clock.tick(ct.FPS)
     # 1. USER INPUT
     for event in pg.event.get():
+
         if event.type == pg.QUIT:
             running = False
-            end = dt.datetime.now()
+        if event.type == pg.MOUSEBUTTONDOWN:
+            mouse_pos_trans = np.array(pg.mouse.get_pos())
+            mouse_pos_real = phy.trans_rev(mouse_pos_trans)
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_t:
                 toogle_trail = not(toogle_trail)
             if event.key == pg.K_d:
                 toogle_distance = not(toogle_distance)
-            if event.key == pg.K_p:
-                ship.prop = 0
             if event.key == pg.K_f:
                 toogle_forces = not(toogle_forces)
             if event.key == pg.K_y:
@@ -106,10 +108,10 @@ while running:
 
     if toogle_trajectory:
         for i in range(len(flight.trayectory)):
-            if i % 100 == 0:
+            if i % 1000 == 0:
                 pg.draw.circle(screen, (0, 255, 0), (int(phy.trans(flight.trayectory[i])[0]), int(phy.trans(flight.trayectory[i])[1])), 2)
         for i in range(len(flight.orbit)):
-            if i % 100 == 0:
+            if i % 200 == 0:
                 pg.draw.circle(screen, (200, 0, 0), (int(phy.trans(flight.orbit[i])[0]), int(phy.trans(flight.orbit[i])[1])), 2)
 
     bodies.draw(screen)
@@ -120,8 +122,10 @@ while running:
     screen.blit(text, (5, 5))
     text, rect = myfont.render(f'Vc: {round(flight.vc, 4)} m/s', (255, 255, 255))
     screen.blit(text, (5, 25))
+
     text, rect = myfont.render(f'Ve: {round(flight.ve, 4)} m/s', (255, 255, 255))
     screen.blit(text, (5, 45))
+
     text, rect = myfont.render(f'F total: {round(phy.distance((0,0),ship.f_total), 4)} N', (255, 255, 255))
     screen.blit(text, (5, 85))
     text, rect = myfont.render(f'Gravity: {round(phy.distance((0,0),ship.g_force), 4)} N', (255, 255, 255))

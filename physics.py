@@ -36,6 +36,14 @@ def trans(array, center=True):
     return trans
 
 
+def trans_rev(array, center=True):
+    trans_rev = array
+    if center:
+        trans_rev = trans_rev - np.array([ct.WIDTH, ct.HEIGHT]) / 2
+    trans_rev = np.dot(trans_rev, base) * ct.SCALE
+    return trans_rev
+
+
 def g_force(body1, body2):
     r = distance(body1.pos, body2.pos)
     f_mod = ct.G * body1.mass * body2.mass / r**2
