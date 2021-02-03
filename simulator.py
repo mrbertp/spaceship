@@ -8,11 +8,11 @@ import control as ctr
 import datetime as dt
 
 # INITIALIZATION
-
+start = dt.datetime.now()
 pg.init()
 screen = pg.display.set_mode((ct.WIDTH, ct.HEIGHT))
 pg.display.set_caption('Simulator')
-clock = pg.time.Clock()
+
 myfont = pg.freetype.SysFont('Consolas', 20)
 
 toogle_trail = ct.trail
@@ -43,12 +43,18 @@ for b in bodies:
         flight = ctr.Flight(ship, b)
 
 
+clock = pg.time.Clock()
 # GAME LOOP
 running = True
+end = dt.datetime.now()
+print('initial', end-start)
 while running:
+
     # 0. run the loop at the desired frame rate
+
     clock.tick(ct.FPS)
-    # 1. USER INPUT
+
+   # 1. USER INPUT
     for event in pg.event.get():
 
         if event.type == pg.QUIT:

@@ -26,7 +26,7 @@ class Flight():
             self.trayectory = []
             self.velocities = []
 
-            self.pred_time = 100 * ct.FPS
+            self.pred_time = 200 * ct.FPS
 
             for i in range(self.pred_time):
                 if i == 0:
@@ -84,6 +84,7 @@ class Flight():
             # thrust
             if (round(self.distance, 2) == round(self.min_distance, 2)):
                 self.thrust_on = True
+                print('on')
 
             if self.thrust_on and (self.thrust_duration > 0):
 
