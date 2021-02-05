@@ -16,8 +16,7 @@ def mag(v):
 
 
 def normalize(v):
-    mod = distance((0, 0), (v[0], v[1]))
-    return (v / mod)
+    return v / mag(v)
 
 
 def rotate(v, alpha):
@@ -62,3 +61,7 @@ def ve(M, r):
 
 def period(r, M):
     return 2 * np.pi * (r**3/(ct.G*M))**(1/2)
+
+
+def angle(a, b):
+    return np.degrees(np.arccos(np.dot(a, b)/(mag(a)*mag(b))))

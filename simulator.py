@@ -54,8 +54,12 @@ while running:
         if event.type == pg.QUIT:
             running = False
         if event.type == pg.MOUSEBUTTONDOWN:
-            mouse_pos_trans = np.array(pg.mouse.get_pos())
-            mouse_pos_real = phy.trans_rev(mouse_pos_trans)
+            x, y = event.pos
+            for b in bodies:
+                if b.rect.collidepoint(x, y):
+                    flight.target = b
+                    flight.calculated = False
+                    print('clicked on', b.ID)
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_t:
                 toogle_trail = not(toogle_trail)
@@ -64,7 +68,8 @@ while running:
             if event.key == pg.K_f:
                 toogle_forces = not(toogle_forces)
             if event.key == pg.K_y:
-                toogle_trajectory = not(toogle_trajectory)
+                if flight.mode == 'Auto-Pilot':
+                    toogle_trajectory = not(toogle_trajectory)
 
     # 2. UPDATE
     # gravity calculation
@@ -99,45 +104,51 @@ while running:
     if toogle_distance:
         pg.draw.line(screen, ct.BLUE, phy.trans(ship.pos), phy.trans(flight.target.pos))
     if toogle_forces:
-        pg.draw.line(screen, ct.YELLOW, phy.trans(ship.pos), phy.trans(ship.pos) + phy.trans(ship.f_total, center=False) * 20 * ct.SCALE)
+        pg.draw.line(screen, ct.YELLOW, phy.trans(ship.pos), phy.trans(ship.pos) + phy.trans(ship.vel, center=False) * 10 * ct.SCALE)
     if toogle_trail:
         trails.draw(screen)
     else:
         trails.empty()
     pg.draw.line(screen, ct.WHITE, phy.trans(ship.pos), phy.trans(ship.pos) + phy.trans(ship.prop, center=False) * 1 * ct.SCALE)
 
-    if toogle_trajectory:
-        for i in range(len(flight.trayectory)):
-            if i % 1000 == 0:
-                pg.draw.circle(screen, (0, 255, 0), (int(phy.trans(flight.trayectory[i])[0]), int(phy.trans(flight.trayectory[i])[1])), 2)
-        for i in range(len(flight.orbit)):
-            if i % 200 == 0:
-                pg.draw.circle(screen, (200, 0, 0), (int(phy.trans(flight.orbit[i])[0]), int(phy.trans(flight.orbit[i])[1])), 2)
-
     bodies.draw(screen)
     ships.draw(screen)
 
     # text
-    text, rect = myfont.render(f'Vel: {round(phy.distance((0,0),ship.vel), 4)} m/s', (255, 255, 255))
-    screen.blit(text, (5, 5))
-    text, rect = myfont.render(f'Vc: {round(flight.vc, 4)} m/s', (255, 255, 255))
-    screen.blit(text, (5, 25))
 
-    text, rect = myfont.render(f'Ve: {round(flight.ve, 4)} m/s', (255, 255, 255))
-    screen.blit(text, (5, 45))
+    if flight.target.ID != 'SHIP':
+        text, rect = myfont.render(f'Vel: {round(phy.mag(ship.vel), 4)} m/s', (255, 255, 255))
+        screen.blit(text, (5, 5))
+        text, rect = myfont.render(f'Vc: {round(flight.vc, 4)} m/s', (255, 255, 255))
+        screen.blit(text, (5, 25))
 
-    text, rect = myfont.render(f'F total: {round(phy.distance((0,0),ship.f_total), 4)} N', (255, 255, 255))
-    screen.blit(text, (5, 85))
-    text, rect = myfont.render(f'Gravity: {round(phy.distance((0,0),ship.g_force), 4)} N', (255, 255, 255))
-    screen.blit(text, (5, 105))
-    text, rect = myfont.render(f'Distance: {round(flight.distance, 0)} u', (255, 255, 255))
-    screen.blit(text, (5, 125))
-    text, rect = myfont.render(f'ERT: {round(flight.ert, 0)} s', (255, 255, 255))
-    screen.blit(text, (5, 145))
-    text, rect = myfont.render('STATUS: ' + flight.status, (255, 255, 255))
-    screen.blit(text, (5, 165))
-    if flight.thrust_on:
-        text, rect = myfont.render('Thrust', (0, 255, 255))
-        screen.blit(text, (5, 185))
+        text, rect = myfont.render(f'Ve: {round(flight.ve, 4)} m/s', (255, 255, 255))
+        screen.blit(text, (5, 45))
+
+        text, rect = myfont.render(f'F total: {round(phy.mag(ship.f_total), 4)} N', (255, 255, 255))
+        screen.blit(text, (5, 85))
+        text, rect = myfont.render(f'Gravity: {round(phy.mag(ship.g_force), 4)} N', (255, 255, 255))
+        screen.blit(text, (5, 105))
+        text, rect = myfont.render(f'Distance: {round(flight.d, 0)} u', (255, 255, 255))
+        screen.blit(text, (5, 125))
+        text, rect = myfont.render(f'ERT: {round(flight.ert, 0)} s', (255, 255, 255))
+        screen.blit(text, (5, 145))
+        text, rect = myfont.render('STATUS: ' + str(flight.parked), (255, 255, 255))
+        screen.blit(text, (5, 165))
+        if flight.thrust_on:
+            text, rect = myfont.render('Thrust', (0, 255, 255))
+            screen.blit(text, (5, 185))
+    else:
+        text, rect = myfont.render(f'Vel: {round(phy.mag(ship.vel), 4)} m/s', (255, 255, 255))
+        screen.blit(text, (5, 5))
+        text, rect = myfont.render(f'F total: {round(phy.mag(ship.f_total), 4)} N', (255, 255, 255))
+        screen.blit(text, (5, 85))
+        text, rect = myfont.render(f'Gravity: {round(phy.mag(ship.g_force), 4)} N', (255, 255, 255))
+        screen.blit(text, (5, 105))
+        text, rect = myfont.render('MODE: ' + flight.mode, (255, 255, 255))
+        screen.blit(text, (5, 165))
+        if flight.thrust_on:
+            text, rect = myfont.render('Thrust', (0, 255, 255))
+            screen.blit(text, (5, 185))
 
     pg.display.flip()
