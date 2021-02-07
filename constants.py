@@ -11,3 +11,4 @@ G = 6.674 * 10**(-11)
 trail = False
 distance = False
 forces = False
+orbit = False

@@ -13,7 +13,7 @@ class Flight():
 
         self.thrust_on = False
         self.thrust_mag = 0
-        # TODO: flight mode switch
+        # DONE: flight mode switch
         self.mode = ''
         self.orbit_status = ''
         self.parked = False
@@ -61,3 +61,4 @@ class Flight():
         else:
 
             self.mode = 'Free-Flight'
+            self.parked = False

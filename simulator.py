@@ -18,6 +18,7 @@ myfont = pg.freetype.SysFont('Consolas', 20)
 toogle_trail = ct.trail
 toogle_distance = ct.distance
 toogle_forces = ct.forces
+toogle_orbit = ct.orbit
 # TODO: isolate trajectory calculation out of game loop
 marker = 0
 
@@ -56,6 +57,8 @@ while running:
                 if b.rect.collidepoint(x, y):
                     flight.target = b
         if event.type == pg.KEYDOWN:
+            if event.key == pg.K_r:
+                flight.target = ship
             if event.key == pg.K_t:
                 toogle_trail = not(toogle_trail)
             if flight.mode == 'Auto-Pilot':
@@ -63,6 +66,8 @@ while running:
                     toogle_distance = not(toogle_distance)
             if event.key == pg.K_f:
                 toogle_forces = not(toogle_forces)
+            if event.key == pg.K_o:
+                toogle_orbit = not(toogle_orbit)
 
     # 2. UPDATE
     # gravity calculation
@@ -103,7 +108,8 @@ while running:
         trails.draw(screen)
     else:
         trails.empty()
-    if flight.parked:
+    # DONE: orbit toogle
+    if flight.parked and toogle_orbit:
         pg.draw.circle(screen, ct.BLUE, (int(phy.trans(flight.target.pos)[0]), int(phy.trans(flight.target.pos)[1])), int(flight.radius/ct.SCALE), 1)
 
     bodies.draw(screen)
