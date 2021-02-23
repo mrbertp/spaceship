@@ -1,3 +1,5 @@
+# NAVIGATION
+
 FPS = 100
 WIDTH = 800
 HEIGHT = 800
@@ -12,3 +14,7 @@ trail = False
 distance = False
 forces = False
 orbit = False
+
+# COMMUNICATION
+
+MAX_CONNECTIONS = 5

@@ -108,7 +108,6 @@ while running:
         trails.draw(screen)
     else:
         trails.empty()
-    # DONE: orbit toogle
     if flight.parked and toogle_orbit:
         pg.draw.circle(screen, ct.BLUE, (int(phy.trans(flight.target.pos)[0]), int(phy.trans(flight.target.pos)[1])), int(flight.radius/ct.SCALE), 1)
 
