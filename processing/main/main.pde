@@ -1,19 +1,25 @@
 ArrayList<Body> bodies;
-Body ship;
-Body sun;
-Body b1, b2;
+Body body, ship, star;
+String[] map;
 
 void setup() {
   size(800, 600);
-  frameRate(60);
+  frameRate(120);
   rectMode(CENTER);
-  
-  ship = new Body("ship", new PVector(0, 2000), new PVector(-6, 0), 100.0, int(10/sf), color(100, 100, 200));
-  sun = new Body("sun", new PVector(0,0), new PVector(0, 0), 1000000000000000.0, int(50/sf), color(200, 200, 100));
-  bodies = new ArrayList<Body>();
-  bodies.add(ship);
-  bodies.add(sun);
 
+  bodies = new ArrayList<Body>();
+  map = loadStrings("map.txt");
+  for (int i=1; i < map.length; i++) {
+    String[] fields = map[i].split("\t");
+    String id = fields[0];
+    PVector pos = new PVector(int(fields[1]), int(fields[2]));
+    PVector vel = new PVector(int(fields[3]), int(fields[4]));
+    float m = float(fields[5]);
+    int s = int(fields[6]);
+    color c = color(int(fields[7]), int(fields[8]), int(fields[9]));
+    body = new Body(id, pos, vel, m, s, c);
+    bodies.add(body);
+  }
 }
 
 void draw() {
@@ -32,11 +38,19 @@ void draw() {
     bodies.get(i).move();
     bodies.get(i).display();
   }
+
   resetMatrix();
   textSize(20);
   fill(200);
-  text("vel: " + nf(ship.vel.mag(), 0, 4) + " m/s", 10, height-10);
-  text("vc: " + nf(vc(sun.m, PVector.sub(sun.pos, ship.pos).mag()), 0, 4) + " m/s", 10, height-30);
-  text("ve: " + nf(sqrt(2) * vc(sun.m, PVector.sub(sun.pos, ship.pos).mag()), 0, 4) + " m/s", 10, height-50);
-
+  for (int i=0; i < bodies.size(); i++) {
+    if (bodies.get(i).id.equals("ship")) {
+      ship = bodies.get(i);      
+    }
+    if (bodies.get(i).id.equals("star")) {
+      star = bodies.get(i);
+    }
+  }
+  text("vel: " + nf(ship.vel.mag(), 0, 2) + " m/s", 10, height-10);
+  text("vc: " + nf(vc(star.m, PVector.sub(star.pos, ship.pos).mag()), 0, 2) + " m/s", 10, height-30);
+  text("ve: " + nf(sqrt(2) * vc(star.m, PVector.sub(star.pos, ship.pos).mag()), 0, 2) + " m/s", 10, height-50);
 }

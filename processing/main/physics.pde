@@ -1,4 +1,4 @@
-float sf = 0.1;
+float sf = 0.05;
 float G = 6.674 * pow(10, -11);
 
 PVector g_force(Body body1, Body body2) {

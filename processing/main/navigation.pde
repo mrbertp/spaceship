@@ -18,9 +18,9 @@ class Body {
     c = col;
     force = new PVector(0.0, 0.0);
     grav = new PVector(0.0, 0.0);
-    
+
     trail = new ArrayList<PVector>();
-    trail_max = 100000000;
+    trail_max = 1000000;
   }
 
   void move() {
@@ -28,15 +28,15 @@ class Body {
     acc = force.copy().div(m);
     vel = vel.copy().add(acc);
     pos = pos.copy().add(vel);
-    if(trail.size() > trail_max){
+    if (trail.size() > trail_max) {
       trail.remove(0);
     }
-    if(frameCount % int(100*sf) == 0){
+    if (frameCount % int(500*sf) == 0) {
       trail.add(pos.copy());
     }
     fill(c);
     for (int i = 0; i < trail.size(); i++) {
-      ellipse(trail.get(i).x, trail.get(i).y, s/4, s/4);
+      ellipse(trail.get(i).x, trail.get(i).y, s/2, s/2);
     }
   }
 
