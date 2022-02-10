@@ -1,47 +1,32 @@
-class Body {
-
+class Navigation{
   String id;
-  PVector pos, vel, acc, force, grav;
-  float m;
-  int s;
-  color c;
-  ArrayList<PVector> trail;
-  int trail_max;
-
-  Body(String identifier, PVector position, PVector velocity, float mass, int size, color col) {
-
-    id = identifier;
-    pos = position;
-    vel = velocity;
-    m = mass;
-    s = size;
-    c = col;
-    force = new PVector(0.0, 0.0);
-    grav = new PVector(0.0, 0.0);
-
-    trail = new ArrayList<PVector>();
-    trail_max = 1000000;
+  ArrayList<Body> bodies;
+  
+  Navigation(String id_val, ArrayList<Body> bodies_val){
+    id = id_val;
+    bodies = bodies_val;
   }
+  
+  void display(){
+    background(0);
+    fill(200);
+    textSize(20);
+    text("vel: " + nf(ship.vel.mag(), 0, 2) + " m/s", 10, height-10);
+    text("vc: " + nf(vc(star.m, PVector.sub(star.pos, ship.pos).mag()), 0, 2) + " m/s", 10, height-30);
+    text("ve: " + nf(sqrt(2) * vc(star.m, PVector.sub(star.pos, ship.pos).mag()), 0, 2) + " m/s", 10, height-50);
+    text(str(over_button(mouseX, mouseY, x, y, size)), 10, height-70);    
+    
+    fill(100);
+    rect(x, y, size, size);
+    
+    rectMode(CENTER);
+    translate(width/2, height/2);
+    scale(sf);
+    
+    for (int i = 0; i < bodies.size(); i++) {
+      bodies.get(i).display();
+    }
 
-  void move() {
-    force = grav;
-    acc = force.copy().div(m);
-    vel = vel.copy().add(acc);
-    pos = pos.copy().add(vel);
-    if (trail.size() > trail_max) {
-      trail.remove(0);
-    }
-    if (frameCount % int(500*sf) == 0) {
-      trail.add(pos.copy());
-    }
-    fill(c);
-    for (int i = 0; i < trail.size(); i++) {
-      ellipse(trail.get(i).x, trail.get(i).y, s/2, s/2);
-    }
   }
-
-  void display() {
-    fill(c);
-    ellipse(pos.x, pos.y, s, s);
-  }
+  
 }
