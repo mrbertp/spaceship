@@ -3,17 +3,20 @@ Body body, ship, star;
 String[] map;
 float x, y, size;
 boolean inside_x, inside_y;
-String screen;
 Navigation nav_screen;
 Structure struc_screen;
+String screen;
+
 
 void setup() {
-  size(800, 800);
+  size(800, 800, P3D);
   frameRate(60);
+  rectMode(CENTER);
 
   x = 50;
   y = 50;
   size = 50;
+
   screen = "navigation";
 
   bodies = new ArrayList<Body>();
@@ -37,6 +40,7 @@ void setup() {
       bodies.add(body);
     }
   }
+
   nav_screen = new Navigation("navi", bodies);
   struc_screen = new Structure("struc");
 }
@@ -63,13 +67,13 @@ void draw() {
 
 
 // FUNCTIONS
-boolean over_button(float test_x, float test_y, float x, float y, float size) {
-  if (test_x < x+size/2 && test_x > x-size/2) {
+boolean over(float x, float y, float size) {
+  if (mouseX < x+size/2 && mouseX > x-size/2) {
     inside_x = true;
   } else {
     inside_x = false;
   }
-  if (test_y < y+size/2 && test_y > y-size/2) {
+  if (mouseY < y+size/2 && mouseY > y-size/2) {
     inside_y = true;
   } else {
     inside_y = false;
@@ -78,13 +82,11 @@ boolean over_button(float test_x, float test_y, float x, float y, float size) {
 }
 
 void mouseClicked() {
-  if (over_button(mouseX, mouseY, x, y, size)) {
+  if (over(x, y, size)) {
     if (screen.equals("navigation")) {
       screen = "structure";
-      println("switching to structure");
     } else if (screen.equals("structure")) {
       screen = "navigation";
-      println("switching to navigation");
     }
   }
 }

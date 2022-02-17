@@ -57,6 +57,7 @@ class Body {
 
   void display() {
     fill(c);
+    noStroke();
     ellipse(pos.x, pos.y, s, s);
   }
 }
