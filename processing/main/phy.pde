@@ -61,3 +61,17 @@ class Body {
     ellipse(pos.x, pos.y, s, s);
   }
 }
+
+
+PVector rot(float[][] mat, PVector u) {
+  float[] r = new float[3];
+  for (int i = 0; i < mat.length; i++) {
+    float sum = 0;
+    for (int j = 0; j < mat[0].length; j++) {
+      sum += mat[i][j] * u.array()[j];
+    }
+    r[i] = sum;
+  }
+  PVector result = new PVector(r[0], r[1], r[2]);
+  return result;
+}

@@ -5,9 +5,11 @@ class Structure {
   int x, y, z;
   float[] xs, ys, zs, ws, hs, ds;
   float cx, cy, cz;
-  ArrayList<PVector> backbone;
+  PVector[] backbone, struc;
+  PVector disp;
   color[] colors;
-  float anglex, angley;
+  float anglex, angley, a;
+  float[][] rotX, rotY, rotZ;
   float anchorx, anchory;
   Boolean anchored;
 
@@ -16,12 +18,30 @@ class Structure {
     size = 50;
     buttonx = 50;
     buttony = 50;
-    backbone = new ArrayList<PVector>();
     anglex = 0;
     angley = 0;
+    a = 1;
     anchored = false;
     anchorx = 0;
     anchory = 0;
+
+    rotX = new float[][]{
+      {1, 0, 0},
+      {0, cos(radians(a)), -sin(radians(a))},
+      {0, sin(radians(a)), cos(radians(a))}
+    };
+
+    rotY = new float[][]{
+      {cos(radians(a)), 0, sin(radians(a))},
+      {0, 1, 0},
+      {-sin(radians(a)), 0, cos(radians(a))}
+    };
+
+    rotZ = new float[][]{
+      {cos(radians(a)), -sin(radians(a)), 0},
+      {sin(radians(a)), cos(radians(a)), 0},
+      {0, 0, 1}
+    };
 
     blueprint = loadStrings("blueprint.txt");
     xs = new float[blueprint.length-1];
@@ -30,7 +50,9 @@ class Structure {
     ws = new float[blueprint.length-1];
     hs = new float[blueprint.length-1];
     ds = new float[blueprint.length-1];
-    
+    backbone = new PVector[blueprint.length-1];
+    struc = new PVector[(blueprint.length-1)*8];
+
     for (int i=1; i<blueprint.length; i++) {
       xs[i-1] = int(blueprint[i].split("\t")[0]);
       ys[i-1] = int(blueprint[i].split("\t")[1]);
@@ -38,17 +60,33 @@ class Structure {
       ws[i-1] = int(blueprint[i].split("\t")[3]);
       hs[i-1] = int(blueprint[i].split("\t")[4]);
       ds[i-1] = int(blueprint[i].split("\t")[5]);
-      backbone.add(new PVector(xs[i-1], ys[i-1], zs[i-1]));
+      backbone[i-1] = new PVector(xs[i-1], ys[i-1], zs[i-1]);
     }
-    
-    colors = new color[backbone.size()];
-    for(int i=0; i<backbone.size(); i++){
-      colors[i] = color(random(0,250), random(0,250), random(0,250));
+
+    colors = new color[backbone.length];
+    for (int i=0; i<backbone.length; i++) {
+      colors[i] = color(random(0, 250), random(0, 250), random(0, 250));
     }
-    
+
+    int h = 0;
+    for (int i=0; i<backbone.length; i++) {
+      for (float j=-1; j<=1; j+=2) {
+        for (float k=-1; k<=1; k+=2) {
+          for (float l=-1; l<=1; l+=2) {
+            struc[h] = new PVector(j/2*ws[i]+size*backbone[i].x, k/2*hs[i]+size*backbone[i].y, l/2*ds[i]+size*backbone[i].z);
+            h += 1;
+          }
+        }
+      }
+    }
     cx = (max(xs) - min(xs))/2 + min(xs);
     cy = (max(ys) - min(ys))/2 + min(ys);
     cz = (max(zs) - min(zs))/2 + min(zs);
+
+    disp = new PVector(-cx*size, -cy*size, -cz*size);
+    for (int i=0; i<struc.length; i++) {
+      struc[i].add(disp);
+    }
   }
 
   void display() {
@@ -83,18 +121,18 @@ class Structure {
     rotateX(radians(-anglex));
     rotateY(radians(angley));
 
+    for (int i=72; i<struc.length; i++) {
+      struc[i] = rot(rotX, struc[i]);
+    }
     pushMatrix();
-    translate(-cx*size, -cy*size, -cz*size);
-    strokeWeight(3);
-    for (int i=0; i<backbone.size(); i++) {
-      for (float j=-1; j<=1; j+=2) {
-        for (float k=-1; k<=1; k+=2) {
-          for (float l=-1; l<=1; l+=2) {
-            stroke(colors[i]);
-            point(j/2*ws[i]+size*backbone.get(i).x, k/2*hs[i]+size*backbone.get(i).y, l/2*ds[i]+size*backbone.get(i).z);
-          }
-        }
-      }
+    strokeWeight(4);
+    /*
+    stroke(color(200, 0, 0));
+     point(disp.x, disp.y, disp.z);
+     */
+    for (int i = 0; i < struc.length; i++) {
+      stroke(200);
+      point(struc[i].x, struc[i].y, struc[i].z);
     }
     popMatrix();
   }
