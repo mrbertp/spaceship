@@ -35,7 +35,7 @@ class Body {
     grav = new PVector(0.0, 0.0);
 
     trail = new ArrayList<PVector>();
-    trail_max = 0;
+    trail_max = 50;
   }
 
   void move() {
@@ -46,18 +46,21 @@ class Body {
     if (trail.size() > trail_max) {
       trail.remove(0);
     }
-    if (frameCount % int(500*sf) == 0) {
+    if (frameCount % int(100*sf) == 0) {
       trail.add(pos.copy());
     }
-    fill(c);
-    for (int i = 0; i < trail.size(); i++) {
-      ellipse(trail.get(i).x, trail.get(i).y, s/2, s/2);
-    }
+    
   }
 
   void display() {
     fill(c);
     noStroke();
+    // reallocated trail display to display function
+    for (int i = 0; i < trail.size(); i++) {
+      ellipse(trail.get(i).x, trail.get(i).y, s/4, s/4);
+    }
+    stroke(0);
+    strokeWeight(20);
     ellipse(pos.x, pos.y, s, s);
   }
 }

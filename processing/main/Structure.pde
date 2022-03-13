@@ -1,13 +1,13 @@
 class Structure {
   String id;
   int buttonx, buttony;
-  String[] blueprint;
+  String[] blueprint, ps, fields;
+  StringList pieces;
   int x, y, z;
   float[] xs, ys, zs, ws, hs, ds;
   float cx, cy, cz;
-  PVector[] backbone, struc;
+  HashMap<String, ArrayList<PVector>> spine, struc;
   PVector disp;
-  color[] colors;
   float anglex, angley, a;
   float[][] rotX, rotY, rotZ;
   float anchorx, anchory;
@@ -44,49 +44,52 @@ class Structure {
     };
 
     blueprint = loadStrings("blueprint.txt");
+
     xs = new float[blueprint.length-1];
     ys = new float[blueprint.length-1];
     zs = new float[blueprint.length-1];
-    ws = new float[blueprint.length-1];
-    hs = new float[blueprint.length-1];
-    ds = new float[blueprint.length-1];
-    backbone = new PVector[blueprint.length-1];
-    struc = new PVector[(blueprint.length-1)*8];
+    spine = new HashMap<String, ArrayList<PVector>>();
+    struc = new HashMap<String, ArrayList<PVector>>();
 
     for (int i=1; i<blueprint.length; i++) {
-      xs[i-1] = int(blueprint[i].split("\t")[0]);
-      ys[i-1] = int(blueprint[i].split("\t")[1]);
-      zs[i-1] = int(blueprint[i].split("\t")[2]);
-      ws[i-1] = int(blueprint[i].split("\t")[3]);
-      hs[i-1] = int(blueprint[i].split("\t")[4]);
-      ds[i-1] = int(blueprint[i].split("\t")[5]);
-      backbone[i-1] = new PVector(xs[i-1], ys[i-1], zs[i-1]);
+      fields = blueprint[i].split("\t");
+
+      xs[i-1] = float(fields[1]);
+      ys[i-1] = float(fields[2]);
+      zs[i-1] = float(fields[3]);
+
+      if (!spine.keySet().contains(fields[0])) {
+        spine.put(fields[0], new ArrayList<PVector>());
+      }
+      spine.get(fields[0]).add(new PVector(int(fields[1]), int(fields[2]), int(fields[3])));
     }
 
-    colors = new color[backbone.length];
-    for (int i=0; i<backbone.length; i++) {
-      colors[i] = color(random(0, 250), random(0, 250), random(0, 250));
-    }
-
-    int h = 0;
-    for (int i=0; i<backbone.length; i++) {
-      for (float j=-1; j<=1; j+=2) {
-        for (float k=-1; k<=1; k+=2) {
-          for (float l=-1; l<=1; l+=2) {
-            struc[h] = new PVector(j/2*ws[i]+size*backbone[i].x, k/2*hs[i]+size*backbone[i].y, l/2*ds[i]+size*backbone[i].z);
-            h += 1;
+    for (String m : spine.keySet()) {
+      struc.put(m, new ArrayList<PVector>());
+      for (int i=0; i<spine.get(m).size(); i++) {
+        for (float j=-1; j<=1; j+=2) {
+          for (float k=-1; k<=1; k+=2) {
+            for (float l=-1; l<=1; l+=2) {
+              struc.get(m).add(new PVector(size*(spine.get(m).get(i).x + j/2), size*(spine.get(m).get(i).y + k/2), size*(spine.get(m).get(i).z + l/2)));
+            }
           }
         }
       }
     }
+
     cx = (max(xs) - min(xs))/2 + min(xs);
     cy = (max(ys) - min(ys))/2 + min(ys);
     cz = (max(zs) - min(zs))/2 + min(zs);
-
     disp = new PVector(-cx*size, -cy*size, -cz*size);
-    for (int i=0; i<struc.length; i++) {
-      struc[i].add(disp);
+
+    for (String m : struc.keySet()) {
+      for (PVector v : struc.get(m)) {
+        v.add(disp);
+      }
     }
+    
+    pieces = new StringList();
+    pieces.append("jesse");
   }
 
   void display() {
@@ -120,19 +123,25 @@ class Structure {
 
     rotateX(radians(-anglex));
     rotateY(radians(angley));
-
-    for (int i=72; i<struc.length; i++) {
-      struc[i] = rot(rotX, struc[i]);
+    
+    for (String m : pieces){
+      for (int i=0; i<struc.get(m).size(); i++){
+        PVector aux = spine.get(m).get(i / 8).copy().add(disp);
+        struc.get(m).set(i, rot(rotX, struc.get(m).get(i).sub(aux)).add(aux));
+      }
     }
+
     pushMatrix();
     strokeWeight(4);
-    /*
+    
     stroke(color(200, 0, 0));
-     point(disp.x, disp.y, disp.z);
-     */
-    for (int i = 0; i < struc.length; i++) {
-      stroke(200);
-      point(struc[i].x, struc[i].y, struc[i].z);
+    point(disp.x, disp.y, disp.z);
+    
+    for (String m : struc.keySet()) {
+      for (PVector v : struc.get(m)) {
+        stroke(200);
+        point(v.x, v.y, v.z);
+      }
     }
     popMatrix();
   }
