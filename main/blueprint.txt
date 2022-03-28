@@ -1,0 +1,9 @@
+piece	x	y	z	j	rX	rY	rZ
+jesse	0	0	0	1	0	0	0
+jesse	1	0	0	0	0	0	0
+jesse	2	0	0	0	0	0	0
+walt	0	1	0	0	0	0	0
+walt	0	1	0	0	0	0	0
+walt	0	2	0	1	0	0	0
+walt	0	3	0	0	0	0	0
+walt	0	4	0	0	0	0	0

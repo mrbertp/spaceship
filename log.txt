@@ -1,4 +1,0 @@
-log	2021-02-24 00:21:53.095786
-[NAV]: hola cliant
-[NAV]: eugh
-[NAV]: END
