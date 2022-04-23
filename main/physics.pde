@@ -1,5 +1,7 @@
 float sf = 0.08;
-float G = 6.674 * pow(10, -11);
+float G = 6.674e-11;
+float Is = 5.961e7;
+float Rs = 6.96e8;
 
 PVector g_force(Body body1, Body body2) {
   PVector r = body2.pos.copy().sub(body1.pos);
@@ -9,7 +11,6 @@ PVector g_force(Body body1, Body body2) {
 }
 
 float vc(float m_atractor, float d) {
-  float G = 6.674 * pow(10, -11);
   return sqrt(G * m_atractor / d);
 }
 
@@ -62,4 +63,8 @@ class Body {
     strokeWeight(20);
     ellipse(pos.x, pos.y, s, s);
   }
+}
+
+float I(float d){
+  return Is * pow(Rs/d, 2);
 }

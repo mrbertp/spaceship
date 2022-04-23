@@ -5,12 +5,13 @@ float x, y, size;
 boolean inside_x, inside_y;
 Navigation nav_screen;
 Structure struc_screen;
+Energy energy_screen;
 String screen;
 
 
 void setup() {
   size(800, 800, P3D);
-  frameRate(60);
+  frameRate(120);
   rectMode(CENTER);
 
   x = 50;
@@ -43,6 +44,7 @@ void setup() {
 
   nav_screen = new Navigation("navi", bodies);
   struc_screen = new Structure("struc");
+  energy_screen = new Energy("energy");
 }
 
 void draw() {
@@ -63,6 +65,8 @@ void draw() {
   if (screen.equals("structure")) {
     struc_screen.display();
   }
+  
+  energy_screen.update();
 }
 
 
