@@ -1,4 +1,4 @@
-float sf = 0.08;
+float sf = 0.07;
 float G = 6.674e-11;
 float Is = 5.961e7;
 float Rs = 6.96e8;
@@ -36,7 +36,7 @@ class Body {
     grav = new PVector(0.0, 0.0);
 
     trail = new ArrayList<PVector>();
-    trail_max = 50;
+    trail_max = 20;
   }
 
   void move() {
@@ -47,7 +47,7 @@ class Body {
     if (trail.size() > trail_max) {
       trail.remove(0);
     }
-    if (frameCount % int(100*sf) == 0) {
+    if (frameCount % int(300*sf) == 0) {
       trail.add(pos.copy());
     }
   }
@@ -56,12 +56,21 @@ class Body {
     fill(c);
     noStroke();
     // reallocated trail display to display function
+    
     for (int i = 0; i < trail.size(); i++) {
-      ellipse(trail.get(i).x, trail.get(i).y, s/4, s/4);
+      pushMatrix();
+      translate(trail.get(i).x, trail.get(i).y, trail.get(i).z);
+      sphere(s/6);
+      popMatrix();
     }
-    stroke(0);
-    strokeWeight(20);
-    ellipse(pos.x, pos.y, s, s);
+        
+    stroke(c);
+    strokeWeight(1);
+    
+    pushMatrix();
+    translate(pos.x, pos.y, pos.z);
+    sphere(s);
+    popMatrix();
   }
 }
 

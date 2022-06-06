@@ -1,9 +1,7 @@
 class Structure {
-  String id;
-  int buttonx, buttony;
+  float size;
   String[] blueprint, ps, fields;
   StringList pieces;
-  int x, y, z;
   float[] xs, ys, zs, ws, hs, ds;
   float cx, cy, cz;
   HashMap<String, ArrayList<PVector>> spine, struc, rs;
@@ -14,11 +12,9 @@ class Structure {
   float anchorx, anchory;
   Boolean anchored;
 
-  Structure(String id_val) {
-    id = id_val;
+  Structure() {
+
     size = 30;
-    buttonx = 50;
-    buttony = 50;
     anglex = 0;
     angley = 0;
     anchored = false;
@@ -78,23 +74,38 @@ class Structure {
     }
   }
 
+  void update() {
+    for (String m : spine.keySet()) {
+      ref = (spine.get(m).get(joints.get(m).get(0)).copy().add(disp)).copy().mult(size);
+      stroke(color(200, 0, 0));
+      point(ref.x, ref.y, ref.z);
+      rot = rs.get(m).get(0);
+      for (int i=0; i<struc.get(m).size(); i++) {
+        aux = struc.get(m).get(i).copy().sub(ref);
+        aux = rot(rot.x, rot.y, rot.z, aux);
+        struc.get(m).set(i, aux.copy().add(ref));
+      }
+    }
+  }
+
   void display() {
     background(0);
+    pushMatrix();
     stroke(200);
     strokeWeight(1);
 
     fill(100);
-    rect(buttonx, buttony, size, size);
 
     stroke(150);
     strokeWeight(0.5);
 
+    //guides
     //line(width/2, 0, width/2, height);
     //line(0, height/2, width, height/2);
 
     translate(width/2, height/2);
 
-    if (mouseButton == RIGHT && !over(x, y, size)) {
+    if (mouseButton == RIGHT && !over(struc_button.posx, struc_button.posy, struc_button.size)) {
       if (!anchored) {
         anchorx = mouseX;
         anchory = mouseY;
@@ -108,22 +119,7 @@ class Structure {
     }
 
     rotateX(radians(-anglex));
-    rotateY(radians(angley));
-
-    pushMatrix();
-    strokeWeight(2);
-
-    for (String m : spine.keySet()) {
-      ref = (spine.get(m).get(joints.get(m).get(0)).copy().add(disp)).copy().mult(size);
-      stroke(color(200, 0, 0));
-      point(ref.x, ref.y, ref.z);
-      rot = rs.get(m).get(0);
-      for (int i=0; i<struc.get(m).size(); i++) {
-        aux = struc.get(m).get(i).copy().sub(ref);
-        aux = rot(rot.x, rot.y, rot.z, aux);
-        struc.get(m).set(i, aux.copy().add(ref));
-      }
-    }
+    rotateZ(radians(angley));
 
     strokeWeight(1);
     stroke(100);
